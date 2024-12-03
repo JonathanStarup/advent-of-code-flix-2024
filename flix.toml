@@ -3,3 +3,4 @@ name        = "advent-of-code-flix-2024"
 description = "test"
 version     = "0.1.0"
 flix        = "0.54.0"
+authors     = ["John Doe <john@example.com>"]
