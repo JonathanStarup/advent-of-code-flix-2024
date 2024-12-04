@@ -19,13 +19,13 @@ mod Day1 {
         (0, m1) ||> foldWithKey((sum, id, freq) -> sum + id * getWithDefault(id, 0, m2) * freq)
     }
 
-    pub def parse(l: List[String]): (List[Int32], List[Int32]) \ Abort = {
+    pub def parse(lines: List[String]): (List[Int32], List[Int32]) \ Abort = {
         use Int32.fromString;
         use List.unzip;
         use Regex.split;
         use Util.Option.get;
 
-        l |> map(s -> {
+        lines |> map(s -> {
             match split(regex = regex" +", s) {
                 case one :: two :: Nil => (fromString(one) |> get, fromString(two) |> get)
                 case other => Abort.abort("Expected two ints, not %{other}.")
@@ -34,14 +34,14 @@ mod Day1 {
     }
 
     pub def solve1FromFile(): Unit \ IO = {
-        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr;
+        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr();
         Util.Effect.runWith(handler)(() -> {
             FileRead.readLines("./inputs/Day1.txt") |> parse ||> solve1 |> println
         })
     }
 
     pub def solve2FromFile(): Unit \ IO = {
-        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr;
+        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr();
         Util.Effect.runWith(handler)(() -> {
             FileRead.readLines("./inputs/Day1.txt") |> parse ||> solve2 |> println
         })

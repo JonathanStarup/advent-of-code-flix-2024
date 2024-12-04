@@ -10,9 +10,9 @@ mod Util {
     mod Abort {
         import java.lang.System
 
-        pub def handleWithErr(f: a -> Unit \ ef): a -> Unit \ ef + IO - Abort = {
+        pub def handleWithErr(default: t, f: a -> t \ ef): a -> t \ ef + IO - Abort = {
             x -> run f(x) with Abort {
-                def abort(m, _) = System.err.println("Err: ${m}")
+                def abort(m, _) = {System.err.println("Err: ${m}"); default}
             }
         }
     }
@@ -32,7 +32,7 @@ mod Util {
     }
 
     mod Effect {
-        pub def runWith(handler: (Unit -> Unit \ ef1) -> (Unit -> b \ ef2), f: Unit -> Unit \ ef1): b \ ef2 =
+        pub def runWith(handler: (Unit -> a \ ef1) -> (Unit -> b \ ef2), f: Unit -> a \ ef1): b \ ef2 =
             handler(f)()
     }
 
@@ -43,6 +43,10 @@ mod Util {
                 case Err(err) => Abort.abort(Util.IoError.toString(err))
             }
         }
+    }
+
+    mod Bool {
+        pub def toInt32(b: Bool): Int32 = if (b) 1 else 0
     }
 
 }
