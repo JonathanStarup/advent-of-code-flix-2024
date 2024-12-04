@@ -1,5 +1,4 @@
 mod Day1 {
-    use Map.mapWithKey;
     import java.lang.System
 
     use Functor.map
@@ -10,8 +9,8 @@ mod Day1 {
     use List.sum
     use List.unzip
     use List.zip
+    use Map.mapWithKey
     use Regex.split
-    use String.splitOn
     use Util.Option.get
 
     pub def solve1(l1: List[Int32], l2: List[Int32]): Int32 = {
