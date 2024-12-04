@@ -8,7 +8,7 @@ mod Util {
     }
 
     mod Abort {
-        import java.lang.System
+        import java.lang.System;
 
         pub def handleWithErr(default: t, f: a -> t \ ef): a -> t \ ef + IO - Abort = {
             x -> run f(x) with Abort {
@@ -18,10 +18,10 @@ mod Util {
     }
 
     mod Func {
-        pub def apply(f: Unit -> t \ ef): t \ ef =
+        pub def _apply(f: Unit -> t \ ef): t \ ef =
             f()
 
-        pub def compose(f: b -> c \ ef2, g: a -> b \ ef1): a -> c \ ef1 + ef2 =
+        pub def _compose(f: b -> c \ ef2, g: a -> b \ ef1): a -> c \ ef1 + ef2 =
             g >> f
     }
 
@@ -46,7 +46,7 @@ mod Util {
     }
 
     mod Bool {
-        pub def toInt32(b: Bool): Int32 = if (b) 1 else 0
+        pub def _toInt32(b: Bool): Int32 = if (b) 1 else 0
     }
 
 }
