@@ -22,7 +22,19 @@ mod Util {
 
     mod Func {
 
-        pub def apply(f: Unit -> t \ ef): t \ ef = f()
+        pub def apply(f: Unit -> t \ ef): t \ ef =
+            f()
+
+        pub def compose(f: b -> c \ ef2, g: a -> b \ ef1): a -> c \ ef1 + ef2 =
+            g >> f
+
+    }
+
+    mod IoError {
+
+        pub def toString(err: IoError): String = match err {
+            case IoError.IoError(kind, msg) => "${kind}: ${msg}"
+        }
 
     }
 
