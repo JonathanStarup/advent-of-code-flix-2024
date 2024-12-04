@@ -43,7 +43,7 @@ mod Day2 {
     pub def seqSkipCheck(cond: (Int32, Int32) -> Bool \ ef, l: List[Int32], canSkip: {canSkip = Bool}): Bool \ ef = {
         match l {
             case x :: y :: xs =>
-                if (cond(x, y)) seqSkipCheck(cond, y :: xs, canSkip)    
+                if (cond(x, y)) seqSkipCheck(cond, y :: xs, canSkip)
                 else if (canSkip#canSkip) seqSkipCheck(cond, x :: xs, canSkip = false)
                 else false
             case _ :: Nil => true
@@ -59,23 +59,28 @@ mod Day2 {
         })
     }
 
-    pub def solve1FromFile(): Unit \ IO = {
-        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr();
+    pub def solve1FromFile(): Int32 \ IO = {
+        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr(-1);
         Util.Effect.runWith(handler)(() -> {
-            FileRead.readLines("./inputs/Day2.txt") |> parse |> solve1 |> println
-        })
-    }
-
-    pub def solve2FromFile(): Unit \ IO = {
-        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr();
-        Util.Effect.runWith(handler)(() -> {
-            FileRead.readLines("./inputs/Day2.txt") |> parse |> solve2 |> println
+            FileRead.readLines("./inputs/Day2.txt") |> parse |> solve1
         })
     }
 
     @Test
-    pub def text01(): Bool \ IO = Util.Effect.runWith(Util.Abort.handleWithErr(false))(() -> {
-        List#{"2 1 5 6"} |> parse |> solve2 |> eq(1)
-    })
+    pub def assertDay2Part1(): Bool \ IO = {
+        solve1FromFile() == 502
+    }
+
+    pub def solve2FromFile(): Int32 \ IO = {
+        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr(-1);
+        Util.Effect.runWith(handler)(() -> {
+            FileRead.readLines("./inputs/Day2.txt") |> parse |> solve2
+        })
+    }
+
+    @Test
+    pub def assertDay2Part2(): Bool \ IO = {
+        solve2FromFile() == 544
+    }
 
 }

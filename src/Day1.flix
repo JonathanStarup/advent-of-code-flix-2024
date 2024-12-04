@@ -33,18 +33,28 @@ mod Day1 {
         }) |> unzip
     }
 
-    pub def solve1FromFile(): Unit \ IO = {
-        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr();
+    pub def solve1FromFile(): Int32 \ IO = {
+        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr(-1);
         Util.Effect.runWith(handler)(() -> {
-            FileRead.readLines("./inputs/Day1.txt") |> parse ||> solve1 |> println
+            FileRead.readLines("./inputs/Day1.txt") |> parse ||> solve1
         })
     }
 
-    pub def solve2FromFile(): Unit \ IO = {
-        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr();
+    @Test
+    def assertDay1Part1(): Bool \ IO = {
+        solve1FromFile() == 1765812
+    }
+
+    pub def solve2FromFile(): Int32 \ IO = {
+        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr(-1);
         Util.Effect.runWith(handler)(() -> {
-            FileRead.readLines("./inputs/Day1.txt") |> parse ||> solve2 |> println
+            FileRead.readLines("./inputs/Day1.txt") |> parse ||> solve2
         })
+    }
+
+    @Test
+    pub def assertDay1Part2(): Bool \ IO = {
+        solve2FromFile() == 20520794
     }
 
 }
