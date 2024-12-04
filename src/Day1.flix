@@ -25,11 +25,17 @@ mod Day1 {
         }) |> unzip
     }
 
-    pub def solveFromFile(): Result[String, Unit] \ IO = (() -> {
+    pub def solveFromFile(): Unit \ IO = (() -> {
         FileRead.readLines("./inputs/Day1.txt")
             |> parse
             ||> solv
             |> println
-    }) |> Util.Abort.handleWithErr |> FileRead.handle |> Util.Func.compose(Result.mapErr(Util.IoError.toString)) |> Util.Func.apply
+    }) |> Util.FileRead.handleWithIOAbort |> Util.Abort.handleWithErr |> Util.Func.apply
+
+    pub def solveFromFile2(): Unit \ IO = {
+        Util.Effect.runWith(Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr)(() -> {
+            FileRead.readLines("./inputs/Day1.txt") |> parse ||> solv |> println
+        })
+    }
 
 }
