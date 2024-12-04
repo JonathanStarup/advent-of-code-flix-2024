@@ -1,19 +1,27 @@
 mod Day1 {
-    use Int32.abs;
+    use Map.mapWithKey;
     import java.lang.System
 
-    use Regex.split
-    use List.unzip
+    use Functor.map
+    use Int32.abs
     use Int32.fromString
-    use String.splitOn
-    use List.sum
-    use List.map
-    use List.zip
+    use List.frequency
     use List.sort
+    use List.sum
+    use List.unzip
+    use List.zip
+    use Regex.split
+    use String.splitOn
     use Util.Option.get
 
-    pub def solv(l1: List[Int32], l2: List[Int32]): Int32 = {
+    pub def solve1(l1: List[Int32], l2: List[Int32]): Int32 = {
         (sort(l1), sort(l2)) ||> zip |> map(match (x, y) -> abs(x - y)) |> sum
+    }
+
+    pub def solve2(l1: List[Int32], l2: List[Int32]): Int32 = {
+        let m1 = frequency(l1);
+        let m2 = frequency(l2);
+        (0, m1) ||> Map.foldWithKey((sum, id, freq) -> sum + id * Map.getWithDefault(id, 0, m2) * freq)
     }
 
     pub def parse(l: List[String]): (List[Int32], List[Int32]) \ Abort = {
@@ -25,16 +33,15 @@ mod Day1 {
         }) |> unzip
     }
 
-    pub def solveFromFile(): Unit \ IO = (() -> {
-        FileRead.readLines("./inputs/Day1.txt")
-            |> parse
-            ||> solv
-            |> println
-    }) |> Util.FileRead.handleWithIOAbort |> Util.Abort.handleWithErr |> Util.Func.apply
-
-    pub def solveFromFile2(): Unit \ IO = {
+    pub def solve1FromFile(): Unit \ IO = {
         Util.Effect.runWith(Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr)(() -> {
-            FileRead.readLines("./inputs/Day1.txt") |> parse ||> solv |> println
+            FileRead.readLines("./inputs/Day1.txt") |> parse ||> solve1 |> println
+        })
+    }
+
+    pub def solve2FromFile(): Unit \ IO = {
+        Util.Effect.runWith(Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr)(() -> {
+            FileRead.readLines("./inputs/Day1.txt") |> parse ||> solve2 |> println
         })
     }
 
