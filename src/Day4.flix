@@ -5,24 +5,25 @@ mod Day4 {
     use Foldable.size
     use Util.Foldable.countWithIndex
     use Functor.map
+    use Indexable.get
 
     pub type alias Vector2[t] = Vector[Vector[t]]
 
-    def isChar(row: Int32, col: Int32, c: Char, m: Vector2[Char]): Bool = {
-        use Vector.get;
+    def isChar(row: Int32, col: Int32, c: Char, m: Vector2[Char]): Bool \ OutOfBounds = {
         if (0 <= row and row < size(m))
-            if (0 <= col and col < size(get(row, m))) get(col, get(row, m)) == c
+            if (0 <= col and col < size(m[row]))
+                m[row][col] == c
             else false
         else false
     }
 
-    pub def solve1(m: Vector2[Char]): Int32 = {
-        use Vector.{mapWithIndex, sum};
+    pub def solve1(m: Vector2[Char]): Int32 \ OutOfBounds = {
+        use Vector.mapWithIndex;
 
         def checkFrom(row, col): Int32 = {
-            use Util.Bool.{toInt32 => i};
+            use Util.Bool.toInt32;
 
-            def checkDir(rowD, colD): Int32 = i(
+            def checkDir(rowD, colD): Int32 \ OutOfBounds = toInt32(
                 isChar(row+rowD, col+colD, 'M', m)
                 and isChar(row+rowD*2, col+colD*2, 'A', m)
                 and isChar(row+rowD*3, col+colD*3, 'S', m)
@@ -41,8 +42,8 @@ mod Day4 {
         }) >> sum) |> sum
     }
 
-    pub def solve2(m: Vector2[Char]): Int32 = {
-        use Vector.{get, mapWithIndex, sum};
+    pub def solve2(m: Vector2[Char]): Int32 \ OutOfBounds = {
+        use Vector.mapWithIndex;
 
         def checkFrom(row, col): Bool = {
             def checkDir(rowD, colD) = {
@@ -67,7 +68,7 @@ mod Day4 {
             |> solve1
         })
 
-        @Test
+    @Test
     pub def assertPart1(): Bool \ IO =
         solve1FromFile() == 2390
 
@@ -78,7 +79,7 @@ mod Day4 {
             |> solve2
         })
 
-        @Test
+    @Test
     pub def assertPart2(): Bool \ IO =
         solve2FromFile() == 1809
 

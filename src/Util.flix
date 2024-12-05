@@ -95,8 +95,18 @@ mod Util {
         }
     }
 
-    pub def runAll(default: t, f: Unit -> t \ ef): t \ ef - {Abort, FileRead} + IO = {
-        let handler = Util.FileRead.handleWithIOAbort >> Util.Abort.handleWithErr(default);
+    mod OutOfBounds {
+        pub def handleWithAbort(f: a -> b \ ef): a -> b \ ef - OutOfBounds + Abort =
+            x -> run f(x) with OutOfBounds {
+                def outOfBounds(msg, _k) = Abort.abort(msg)
+            }
+    }
+
+    pub def runAll(default: t, f: Unit -> t \ ef): t \ ef - {Abort, FileRead, OutOfBounds} + IO = {
+        let handler =
+            Util.FileRead.handleWithIOAbort
+            >> OutOfBounds.handleWithAbort
+            >> Util.Abort.handleWithErr(default);
         Effect.runWith(handler)(f)
     }
 
