@@ -49,7 +49,7 @@ mod Util {
     }
 
     mod Bool {
-        pub def _toInt32(b: Bool): Int32 = if (b) 1 else 0
+        pub def toInt32(b: Bool): Int32 = if (b) 1 else 0
     }
 
     mod Tuple {
@@ -64,6 +64,7 @@ mod Util {
 
     mod List {
         use List.length;
+
         pub def take2(l: List[t]): (t, t) \ Abort = match l {
             case one :: two :: Nil => (one, two)
             case _ => Abort.abort("called take2 on list of length ${length(l)}")
@@ -72,6 +73,25 @@ mod Util {
         pub def take2Opt(l: List[t]): Option[(t, t)] = match l {
             case one :: two :: Nil => Some((one, two))
             case _ => None
+        }
+    }
+
+    mod Foldable {
+        pub def countWithIndex(
+            f: (Int32, t) -> Bool \ ef, l: m[t]
+        ): Int32 \ ef + Foldable.Aef[m] with Foldable[m] = {
+            use Add.add;
+            use Foldable.foldLeft;
+            use Ref.{fresh, get, transform};
+
+            region local {
+                let index = fresh(local, -1);
+                (0, l) ||> foldLeft((count, x) -> {
+                    index |> transform(add(1));
+                    if (f(get(index), x)) count + 1
+                    else count
+                })
+            }
         }
     }
 

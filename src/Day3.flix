@@ -72,7 +72,7 @@ mod Day3 {
         })
 
     @Test
-    pub def assertDay2Part1(): Bool \ IO =
+    pub def assertPart1(): Bool \ IO =
         solve1FromFile() == 190604937
 
     pub def solve2FromFile(): Int32 \ IO =
@@ -83,7 +83,7 @@ mod Day3 {
         })
 
     @Test
-    pub def assertDay2Part2(): Bool \ IO =
+    pub def assertPart2(): Bool \ IO =
         solve2FromFile() == 82857512
 
 }
