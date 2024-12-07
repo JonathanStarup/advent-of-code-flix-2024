@@ -130,10 +130,18 @@ mod Util {
             }
     }
 
-    pub def runAll(default: t, f: Unit -> t \ ef): t \ ef - {Abort, FileRead, OutOfBounds} + IO = {
+    mod KeyNotFound {
+        pub def handleWithAbort(f: a -> b \ ef): a -> b \ ef - KeyNotFound + Abort =
+            x -> run f(x) with KeyNotFound {
+                def keyNotFound(msg, _k) = Abort.abort("KeyNotFound: ${msg}")
+            }
+    }
+
+    pub def runAll(default: t, f: Unit -> t \ ef): t \ ef - {Abort, FileRead, OutOfBounds, KeyNotFound} + IO = {
         let handler =
             Util.FileRead.handleWithIOAbort
             >> OutOfBounds.handleWithAbort
+            >> KeyNotFound.handleWithAbort
             >> Util.Abort.handleWithErr(default);
         Effect.runWith(handler)(f)
     }

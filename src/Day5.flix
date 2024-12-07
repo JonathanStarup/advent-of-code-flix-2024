@@ -1,8 +1,5 @@
 mod Day5 {
-    use Foldable.filter
-    use Foldable.foldLeft
-    use Foldable.size
-    use Foldable.sum
+    use Foldable.{foldLeft, nonEmpty, size, sum}
     use FromString.fromString
     use Functor.map
 
@@ -11,7 +8,9 @@ mod Day5 {
         updates = List[List[Int32]]
     }
 
-    pub def solve1(p: Problem): Int32 \ OutOfBounds = {
+    pub def solve1(p: Problem): Int32 \ {OutOfBounds, KeyNotFound} = {
+        use List.filter;
+
         let back = ruleMap(p#rules);
         p#updates
             |> filter(checkUpdates(Set.empty(), back))
@@ -23,42 +22,59 @@ mod Day5 {
         Util.List.nth(size(l) / 2, l)
 
     def ruleMap(l: List[(Int32, Int32)]): MultiMap[Int32, Int32] =
-        (MultiMap.empty(), l) ||> foldLeft(m -> match (pre, post) -> MultiMap.insert(pre, post, m))
+        (MultiMap.empty(), l)
+        ||> foldLeft(m -> match (pre, post) -> MultiMap.insert(pre, post, m))
 
     def checkUpdates(
         seen: Set[Int32], rules: MultiMap[Int32, Int32], updates: List[Int32]
-    ): Bool = match updates {
-        case update :: rest =>
-            if (MultiMap.get(update, rules) |> Set.intersection(seen) |> Set.nonEmpty) false
-            else checkUpdates(seen |> Set.insert(update), rules, rest)
-        case Nil =>
-            true
-    }
-
-    def fixUpdates(
-        acc: List[Int32], seen: Set[Int32], rules: MultiMap[Int32, Int32], updates: List[Int32]
-    ): List[Int32] = {
-        use List.reverse;
+    ): Bool \ KeyNotFound = {
+        use Set.{insert, intersection};
 
         match updates {
             case update :: rest =>
-                let forward = MultiMap.get(update, rules);
-                if (forward |> Set.intersection(seen) |> Set.nonEmpty) {
-                    let acc1 = insertUpTo(update, forward, reverse(acc)) |> reverse;
+                if (rules[update] |> intersection(seen) |> nonEmpty) false
+                else checkUpdates(seen |> insert(update), rules, rest)
+            case Nil =>
+                true
+        }
+    }
+
+    def fixUpdates(
+        acc: List[Int32],
+        seen: Set[Int32],
+        rules: MultiMap[Int32, Int32],
+        updates: List[Int32]
+    ): List[Int32] = {
+        use List.reverse;
+        use MultiMap.get;
+        use Set.{insert, intersection};
+
+        match updates {
+            case update :: rest =>
+                let forward = get(update, rules);
+                if (forward |> intersection(seen) |> nonEmpty) {
+                    let acc1 =
+                        insertUpTo(update, forward, reverse(acc))
+                        |> reverse;
                     fixUpdates(acc1, seen, rules, rest)
-                } else fixUpdates(update :: acc, seen |> Set.insert(update), rules, rest)
+                } else
+                    fixUpdates(update :: acc, seen
+                    |> insert(update), rules, rest)
             case Nil =>
                 reverse(acc)
         }
     }
 
-    def insertUpTo(x: t, to: Set[t], l: List[t]): List[t] with Order[t] = match l {
-        case y :: _ if Set.memberOf(y, to) => x :: l
-        case y :: ys => y :: insertUpTo(x, to, ys)
-        case Nil => Nil
-    }
+    def insertUpTo(x: t, to: Set[t], l: List[t]): List[t] with Order[t] =
+        match l {
+            case y :: _ if Set.memberOf(y, to) => x :: l
+            case y :: ys => y :: insertUpTo(x, to, ys)
+            case Nil => Nil
+        }
 
-    pub def solve2(p: Problem): Int32 \ OutOfBounds = {
+    pub def solve2(p: Problem): Int32 \ {OutOfBounds, KeyNotFound} = {
+        use List.filter;
+
         let back = ruleMap(p#rules);
         p#updates
             |> filter(u -> not checkUpdates(Set.empty(), back, u))
@@ -78,8 +94,14 @@ mod Day5 {
         let (rulesInput, updatesInput0) = List.splitAt(splitPoint, l);
         let updatesInput = List.drop(1, updatesInput0);
 
-        let rules = rulesInput |> map(submatches(substr = regex"\\d+") >> take2 >> app2(fromString >> get));
-        let updates = updatesInput |> map(splitOn(substr = ",") >> map(fromString >> get));
+        let rules = rulesInput |> map(
+            submatches(substr = regex"\\d+")
+            >> take2
+            >> app2(fromString >> get)
+        );
+        let updates = updatesInput |> map(
+            splitOn(substr = ",") >> map(fromString >> get)
+        );
         {rules = rules, updates = updates}
     }
 
