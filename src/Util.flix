@@ -10,7 +10,7 @@ mod Util {
     mod Abort {
         import java.lang.System;
 
-        pub def handleWithErr(default: t, f: a -> t \ ef): a -> t \ ef + IO - Abort = {
+        pub def handleWithPrintDefault(default: t, f: a -> t \ ef): a -> t \ ef + IO - Abort = {
             x -> run f(x) with Abort {
                 def abort(m, _) = {System.err.println("Err: ${m}"); default}
             }
@@ -18,10 +18,10 @@ mod Util {
     }
 
     mod Func {
-        pub def _apply(f: Unit -> t \ ef): t \ ef =
-            f()
+        pub def apply(x: a, f: a -> b \ ef): b \ ef =
+            f(x)
 
-        pub def _compose(f: b -> c \ ef2, g: a -> b \ ef1): a -> c \ ef1 + ef2 =
+        pub def compose(f: b -> c \ ef2, g: a -> b \ ef1): a -> c \ ef1 + ef2 =
             g >> f
 
         pub def >|>(f: a -> (b, c) \ ef1, g: (b, c) -> d \ ef2): a -> d \ ef1 + ef2 =
@@ -93,6 +93,7 @@ mod Util {
             case _ => None
         }
 
+        /// List.map2 should be called zipMap
         pub def map2(f: (a, a) -> b \ ef, l: List[a]): List[b] \ ef = {
             def loop(l0, acc) = match l0 {
                 case one :: two :: rest =>
@@ -142,7 +143,7 @@ mod Util {
             Util.FileRead.handleWithIOAbort
             >> OutOfBounds.handleWithAbort
             >> KeyNotFound.handleWithAbort
-            >> Util.Abort.handleWithErr(default);
+            >> Util.Abort.handleWithPrintDefault(default);
         Effect.runWith(handler)(f)
     }
 
