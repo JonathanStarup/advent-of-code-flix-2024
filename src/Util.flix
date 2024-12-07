@@ -53,6 +53,9 @@ mod Util {
     }
 
     mod Tuple {
+        pub def mk2(x: a, y: b): (a, b) =
+            (x, y)
+
         pub def lift2(f: (a, b) -> c \ ef): ((a, b)) -> c \ ef =
             match (x, y) -> f(x, y)
 
@@ -60,10 +63,25 @@ mod Util {
             match t {
                 case (x, y) => (f(x), f(y))
             }
+
+        pub def swap2(t: (a, b)): (b, a) =
+            (snd(t), fst(t))
     }
 
     mod List {
         use List.length;
+
+        pub def nth(n: Int32, l: List[t]): t \ OutOfBounds = {
+            def loop(n0, l0) = match l0 {
+                case x :: xs =>
+                    if (n0 == 0) x
+                    else loop(n0 - 1, xs)
+                case Nil =>
+                    OutOfBounds.outOfBounds("${n} out of bounds for list of length ${List.length(l)}")
+            };
+            if (n < 0) OutOfBounds.outOfBounds("${n} out of bounds for list of length ${List.length(l)}")
+            else loop(n, l)
+        }
 
         pub def take2(l: List[t]): (t, t) \ Abort = match l {
             case one :: two :: Nil => (one, two)
@@ -73,6 +91,16 @@ mod Util {
         pub def take2Opt(l: List[t]): Option[(t, t)] = match l {
             case one :: two :: Nil => Some((one, two))
             case _ => None
+        }
+
+        pub def map2(f: (a, a) -> b \ ef, l: List[a]): List[b] \ ef = {
+            def loop(l0, acc) = match l0 {
+                case one :: two :: rest =>
+                    loop(two :: rest, Cons(f(one, two)))
+                case _ =>
+                    acc(Nil)
+            };
+            loop(l, x -> checked_ecast(x))
         }
     }
 
@@ -98,7 +126,7 @@ mod Util {
     mod OutOfBounds {
         pub def handleWithAbort(f: a -> b \ ef): a -> b \ ef - OutOfBounds + Abort =
             x -> run f(x) with OutOfBounds {
-                def outOfBounds(msg, _k) = Abort.abort(msg)
+                def outOfBounds(msg, _k) = Abort.abort("OutOfBounds: ${msg}")
             }
     }
 
