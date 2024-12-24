@@ -80,8 +80,9 @@ mod Day2 {
         })
 
     @Test
-    pub def assertPart1(): Bool \ IO =
-        solve1FromFile() == 502
+    pub def assertPart1(): Bool \ IO = Util.Test.runTest(() -> {
+        Util.Test.assertEq(expected = 502, solve1FromFile())
+    })
 
     pub def solve2FromFile(): Int32 \ IO =
         Util.runAll(-1)(() -> {
@@ -91,7 +92,8 @@ mod Day2 {
         })
 
     @Test
-    pub def assertPart2(): Bool \ IO =
-        solve2FromFile() == 544
+    pub def assertPart2(): Bool \ IO = Util.Test.runTest(() -> {
+        Util.Test.assertEq(expected = 544, solve2FromFile())
+    })
 
 }

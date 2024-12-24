@@ -1,5 +1,27 @@
 mod Util {
 
+    mod Test {
+        pub def assertEq(expected: {expected = t}, actual: t): Unit \ Abort with Eq[t], ToString[t] = {
+            if (expected#expected == actual)
+                ()
+            else {
+                Abort.abort("Expected ${expected#expected}, found ${actual}")
+            }
+        }
+
+        pub def assertEqDebug(expected: {expected = t}, actual: t): Unit \ Abort with Eq[t] = {
+            if (expected#expected == actual)
+                ()
+            else {
+                Abort.abort("Expected %{expected#expected}, found %{actual}")
+            }
+        }
+
+        pub def runTest(test: Unit -> Unit \ ef): Bool \ ef - Abort + IO = {
+            (() -> {test(); true}) |> Util.Effect.runWith(Util.Abort.handleWithPrintDefault(false))
+        }
+    }
+
     mod Option {
         pub def get(o: Option[t]): t \ Abort = match o {
             case Some(v) => v
